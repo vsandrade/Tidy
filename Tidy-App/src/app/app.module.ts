@@ -24,6 +24,7 @@ import { CustomersComponent } from './components/customers/customers.component';
 import { NavComponent } from './components/nav/nav.component';
 import { HomeComponent } from './components/home/home.component';
 import { AboutComponent } from './components/about/about.component';
+import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 
 
 @NgModule({
@@ -57,7 +58,8 @@ import { AboutComponent } from './components/about/about.component';
    ],
    providers: [
       CustomerService,
-      FormService
+      FormService,
+      { provide: LocationStrategy, useClass: HashLocationStrategy }
    ],
    bootstrap: [
       AppComponent
