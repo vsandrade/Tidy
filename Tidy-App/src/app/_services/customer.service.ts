@@ -3,13 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Customer } from '../_models/Customer';
 import { Constants } from '../util/Constants';
+import { environment } from 'src/environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CustomerService {
 
-  baseURL = Constants.URLCustomer;
+  baseURL = environment.apiURL;
 
   constructor(private http: HttpClient) { }
 
