@@ -1,0 +1,16 @@
+/* You can add global styles to this file, and also import other style files */
+@import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
+@import '../node_modules/bootswatch/dist/lumen/bootstrap.min.css';
+@import '../node_modules/@fortawesome/fontawesome-free/css/all.min.css';
+
+#toast-container > div {
+  opacity:1;
+}
+.control-label.required:after {
+  color: #d00;
+  content: "*";
+  position: absolute;
+  font-weight: bold;
+  margin-left: 2px;
+  top:0px;
+}

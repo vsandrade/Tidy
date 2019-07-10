@@ -1,0 +1,207 @@
+<div class="d-flex">
+  <h1 class="mt-2 mb-0 mr-auto">
+    <b>Customers</b>
+  </h1>
+  <div class="mt-3">
+    <button class="btn btn-outline-primary" (click)="newCustomer(template)">
+      <i class="fa fa-plus-circle"></i>&nbsp;
+      New Customer
+    </button>
+  </div>
+</div>
+<hr class="my-3">
+<div class="form-group mb-2">
+  <div class="input-group mb-3">
+    <div class="input-group-prepend">
+      <span class="input-group-text"><b>Filtered by:</b></span>
+    </div>
+    <input type="text" class="form-control" placeholder="Search By Name" [(ngModel)]="TextFilter">
+  </div>
+</div>
+<div class="table-responsive-md">
+  <table class="table table-sm table-striped table-hover ">
+    <thead class="thead-light">
+      <tr>
+        <th> <b>#</b> </th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <!-- <th>address</th> -->
+        <th>City</th>
+        <th>State</th>
+        <!-- <th>zipcode</th> -->
+        <th>Created</th>
+        <th>Updated</th>
+        <th>Options</th>
+      </tr>
+    </thead>
+    <tbody *ngIf="CustomersFiltered && CustomersFiltered.length">
+      <tr *ngFor="let customer of CustomersFiltered">
+        <td> <b>{{customer.id}}</b></td>
+        <td>{{customer.name}}</td>
+        <td>{{customer.email}}</td>
+        <td>{{customer.phone}}</td>
+        <!-- <td>{{customer.address}}</td> -->
+        <td>{{customer.city}}</td>
+        <td>{{customer.state}}</td>
+        <!-- <td>{{customer.zipcode}}</td> -->
+        <td>{{customer.created_at | DateTimeFormatPipe}}</td>
+        <td>{{customer.updated_at | DateTimeFormatPipe}}</td>
+        <td>
+          <div class="btn-group" role="group" aria-label="Basic example">
+            <button type="button" class="btn btn-success" tooltip="Edit" (click)="editCustomer(customer, template)">
+              <i class="fa fa-edit"></i>
+            </button>
+            <button type="button" class="btn btn-danger" tooltip="Delete" (click)="deleteCustomer(customer, confirm)">
+              <i class="fa fa-eraser"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+    <tfoot *ngIf="!CustomersFiltered || !CustomersFiltered.length">
+      <tr>
+        <td colspan="10" class="text-center">
+          <h4>Customers not found!</h4>
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+
+<div bsModal #template="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 id="dialog-sizes-name1" class="modal-title pull-left">
+          {{this.modeSave === 'post' ? 'New Customer' : 'Updating Customer' }}
+        </h4>
+        <button type="button" class="close pull-right" (click)="template.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="registerForm">
+          <div class="form-row">
+            <div class="form-group col-md-12" >
+              <label class="control-label required">Name</label>
+              <input [ngClass]="displayFieldCss('name')" type="text" class="form-control"
+                formControlName="name">
+
+              <div *ngIf="registerForm.get('name').invalid &&
+                          (registerForm.get('name').touched || registerForm.get('name').dirty)"
+                class="invalid-feedback">
+
+                <div *ngIf="registerForm.get('name').hasError('required')">
+                  Please informe your Name
+                </div>
+                <div *ngIf="registerForm.get('name').hasError('minlength')">
+                  Name must be at least 4 characters long.
+                </div>
+                <div *ngIf="registerForm.get('name').hasError('maxlength')">
+                  Name must not be more then 60 characters.
+                </div>
+
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-8">
+              <label class="control-label required">Email</label>
+              <input [ngClass]="displayFieldCss('email')" type="text" class="form-control"
+                formControlName="email">
+
+              <div *ngIf="registerForm.get('email').invalid &&
+                (registerForm.get('email').touched || registerForm.get('email').dirty)" class="invalid-feedback">
+
+                <div *ngIf="registerForm.get('email').hasError('required')">
+                  Please informe your Email
+                </div>
+                <div *ngIf="registerForm.get('email').hasError('email')">
+                  Email should be valid.
+                </div>
+
+              </div>
+            </div>
+            <div class="form-group col-md-4">
+              <label class="control-label required">Phone</label>
+              <input mask="(000) 000-0000" [ngClass]="displayFieldCss('phone')" type="text" class="form-control"
+                formControlName="phone">
+              <div class="invalid-feedback">
+                Please informe your Phone
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-4">
+              <label class="control-label required">Address</label>
+              <input [ngClass]="displayFieldCss('address')" type="text" class="form-control"
+                formControlName="address">
+              <div class="invalid-feedback">
+                Please informe your Address
+              </div>
+            </div>
+            <div class="form-group col-md-2">
+              <label class="control-label required">State</label>
+              <input [ngClass]="displayFieldCss('state')" type="text" class="form-control"
+                formControlName="state">
+              <div class="invalid-feedback">
+                Please informe your State
+              </div>
+            </div>
+            <div class="form-group col-md-3">
+              <label class="control-label required">City</label>
+              <input [ngClass]="displayFieldCss('city')" type="text" class="form-control"
+                formControlName="city">
+              <div class="invalid-feedback">
+                Please informe your City
+              </div>
+            </div>
+            <div class="form-group col-md-3">
+              <label class="control-label required">Zipcode</label>
+              <input [ngClass]="displayFieldCss('zipcode')" type="number" class="form-control"
+                formControlName="zipcode">
+              <div class="invalid-feedback">
+                Please informe your Zipcode
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer d-flex">
+        <button class="btn btn-secondary" (click)="template.hide()">
+          Close
+        </button>
+        <button class="btn btn-primary ml-auto" [disabled]="!registerForm.valid" (click)="saveCustomer(template)">
+          Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div bsModal #confirm="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name1">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title pull-left">
+            Deleting Customer
+          </h4>
+          <button type="button" class="close pull-right" (click)="confirm.hide()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>{{msnDeleteCustomer}}</p>
+        </div>
+        <div class="modal-footer btn-group d-flex">
+          <button type="button" class="btn btn-secondary" (click)="confirm.hide()">
+            Cancel
+          </button>
+          <button type="button" class="btn btn-danger" (click)="confirmDelete(confirm)">
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
