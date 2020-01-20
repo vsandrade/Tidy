@@ -7,7 +7,10 @@
     "build": "ng build --prod --source-map",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "ng-build-prod": "ng build --prod",
+    "build-dev": "node change-angular-json.js env=dev && ng build --watch",
+    "build-prod": "node change-angular-json.js env=prod app=rtq && node version.js patch && npm run ng-build-prod && node post-build.js"
   },
   "private": true,
   "dependencies": {
@@ -31,7 +34,7 @@
     "zone.js": "~0.9.1"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "~0.801.0",
+    "@angular-devkit/build-angular": "^0.803.23",
     "@angular/cli": "~8.1.0",
     "@angular/compiler-cli": "~8.1.0",
     "@angular/language-service": "~8.1.0",

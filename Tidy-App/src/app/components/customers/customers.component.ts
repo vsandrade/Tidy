@@ -6,6 +6,8 @@ import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms'
 import { ToastrService } from 'ngx-toastr';
 import { FormService } from 'src/app/_services/form.service';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-customers',
@@ -20,7 +22,9 @@ export class CustomersComponent implements OnInit {
   textFilter: string;
   msnDeleteCustomer: string;
   registerForm: FormGroup;
-  modeSave = 'post';
+  modeSave = 'postCustomer';
+
+  private unsubscriber = new Subject();
 
   constructor(
       private customerService: CustomerService
@@ -56,56 +60,44 @@ export class CustomersComponent implements OnInit {
     this.fetchCustomers();
   }
 
+  ngOnDestroy(): void {
+    this.unsubscriber.next();
+    this.unsubscriber.complete();
+  }
+
   validation() {
     this.registerForm = this.fb.group({
-      name: ['',
-        [Validators.required, Validators.minLength(4), Validators.maxLength(60)]],
-      email: ['',
-        [Validators.required, Validators.email]],
-      phone: ['',
-        [Validators.required]],
-      address: ['',
-        [Validators.required]],
-      state: ['',
-        [Validators.required]],
-      city: ['',
-      [Validators.required]],
-      zipcode: ['',
-        [Validators.required]]
+      name: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(60)]],
+      email: ['', [Validators.required, Validators.email]],
+      phone: ['', [Validators.required]],
+      address: ['', [Validators.required]],
+      state: ['', [Validators.required]],
+      city: ['', [Validators.required]],
+      zipcode: ['', [Validators.required]]
     });
   }
 
   saveCustomer(template: any) {
     if (this.registerForm.valid) {
       this.spinner.show();
-      if (this.modeSave === 'post') {
-        this.customer = Object.assign({}, this.registerForm.value);
-        this.customerService.postCustomer(this.customer).subscribe(
-          () => {
-            template.hide();
-            this.fetchCustomers();
-            this.toastr.success('Customer Saved Successfully!');
-          }, error => {
-            this.toastr.error(`Error: Customer cannot be saved!`);
-            console.error(error);
-          }
-        ).add(() => this.spinner.hide());
 
-      } else {
-        this.customer = Object.assign({id: this.customer.id}, this.registerForm.value);
+      if (this.modeSave === 'postCustomer')
+        this.customer = {...this.registerForm.value};
+      else
+        this.customer = {id: this.customer.id, ...this.registerForm.value};
 
-        this.customerService.putCustomer(this.customer.id, this.customer).subscribe(
-          () => {
-            template.hide();
-            this.fetchCustomers();
-            this.toastr.success('Customer Saved Successfully!');
-          }, error => {
-            this.toastr.error(`Error: Customer cannot be saved!`);
-            console.error(error);
-          }
-        ).add(() => this.spinner.hide());
-
-      }
+      this.customerService[this.modeSave](this.customer)
+        .pipe(takeUntil(this.unsubscriber))
+        .subscribe(
+        () => {
+          template.hide();
+          this.fetchCustomers();
+          this.toastr.success('Customer Saved Successfully!');
+        }, (error: any) => {
+          this.toastr.error(`Error: Customer cannot be saved!`);
+          console.error(error);
+        }
+      ).add(() => this.spinner.hide());
 
     }
   }
@@ -118,12 +110,13 @@ export class CustomersComponent implements OnInit {
 
   confirmDelete(template: any) {
     this.spinner.show();
-    this.customerService.deleteCustomer(this.customer.id).subscribe(
-      () => {
+    this.customerService.deleteCustomer(this.customer.id)
+      .pipe(takeUntil(this.unsubscriber))
+      .subscribe(() => {
         template.hide();
         this.fetchCustomers();
         this.toastr.success('Customer Deleted Successfully.');
-      }, error => {
+      }, (error: any) => {
         this.toastr.error('Error: Deleted Unsuccessfully');
         console.error(error);
       }
@@ -131,7 +124,7 @@ export class CustomersComponent implements OnInit {
   }
 
   editCustomer(customer: Customer, template: any) {
-    this.modeSave = 'put';
+    this.modeSave = 'putCustomer';
     this.openModal(template);
     this.customer = Object.assign({}, customer);
     this.registerForm.patchValue(this.customer);
@@ -139,19 +132,19 @@ export class CustomersComponent implements OnInit {
   }
 
   newCustomer(template: any) {
-    this.modeSave = 'post';
+    this.modeSave = 'postCustomer';
     this.openModal(template);
   }
 
   fetchCustomers() {
     this.spinner.show();
-    this.customerService.getAllCustomers().subscribe(
-      (customer: Customer[]) => {
+    this.customerService.getAllCustomers()
+      .pipe(takeUntil(this.unsubscriber))
+      .subscribe((customer: Customer[]) => {
         this.Customers = customer;
         this.CustomersFiltered = customer;
         this.toastr.success('Customers were loaded successfully!');
-      },
-      error => {
+      }, (error: any) => {
         this.toastr.error('Customers were not loaded!');
         console.log(error);
       }
@@ -167,5 +160,7 @@ export class CustomersComponent implements OnInit {
       'is-invalid': this.isFieldValid(field)
     };
   }
+
+
 
 }
