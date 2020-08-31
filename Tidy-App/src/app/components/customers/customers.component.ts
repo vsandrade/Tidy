@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, TemplateRef } from '@angular/core';
 import { CustomerService } from '../../_services/customer.service';
 import { Customer } from '../../_models/Customer';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap';
@@ -7,14 +7,14 @@ import { ToastrService } from 'ngx-toastr';
 import { FormService } from 'src/app/_services/form.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
+import { Subject } from 'rxjs/Subject';
 
 @Component({
   selector: 'app-customers',
   templateUrl: './customers.component.html',
   styleUrls: ['./customers.component.css']
 })
-export class CustomersComponent implements OnInit {
+export class CustomersComponent implements OnInit, OnDestroy {
 
   CustomersFiltered: Customer[];
   Customers: Customer[];
